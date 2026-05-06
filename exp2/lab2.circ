@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project source="3.7.2" version="1.0">
+  <lib desc="#Wiring" name="0"/>
+  <lib desc="#Gates" name="1"/>
+  <lib desc="#Plexers" name="2"/>
+  <lib desc="#Arithmetic" name="3"/>
+  <lib desc="#Memory" name="4"/>
+  <lib desc="#I/O" name="5"/>
+  <lib desc="#TTL" name="6"/>
+  <lib desc="#TCL" name="7"/>
+  <lib desc="#Base" name="8"/>
+  <lib desc="#BFH-Praktika" name="9"/>
+  <lib desc="#StdLib" name="10"/>
+  <main name="4-bit_RCA"/>
+  <options>
+    <a name="gateUndefined" val="ignore"/>
+    <a name="simlimit" val="1000"/>
+    <a name="simrand" val="0"/>
+  </options>
+  <mappings/>
+  <toolbar>
+    <tool lib="8" name="Poke Tool"/>
+    <sep/>
+    <tool lib="8" name="Edit Tool"/>
+    <tool lib="8" name="Select Tool"/>
+    <sep/>
+    <tool lib="0" name="Pin">
+      <a name="facing" val="east"/>
+    </tool>
+    <tool lib="0" name="Pin">
+      <a name="output" val="true"/>
+    </tool>
+    <sep/>
+    <tool lib="1" name="AND Gate"/>
+    <tool lib="1" name="OR Gate"/>
+    <tool lib="1" name="XOR Gate"/>
+    <tool lib="1" name="NOT Gate"/>
+  </toolbar>
+
+  <!-- ========== Full Adder Sub-circuit ========== -->
+  <circuit name="Full_Adder">
+    <a name="circuit" val="Full_Adder"/>
+    <a name="clabel" val=""/>
+    <a name="clabelup" val="east"/>
+
+    <!-- Inputs: A, B, Cin -->
+    <comp lib="0" loc="(50,100)" name="Pin">
+      <a name="label" val="A"/>
+      <a name="facing" val="east"/>
+    </comp>
+    <comp lib="0" loc="(50,150)" name="Pin">
+      <a name="label" val="B"/>
+      <a name="facing" val="east"/>
+    </comp>
+    <comp lib="0" loc="(50,200)" name="Pin">
+      <a name="label" val="Cin"/>
+      <a name="facing" val="east"/>
+    </comp>
+
+    <!-- XOR1: A XOR B = P (half-sum) -->
+    <comp lib="1" loc="(180,120)" name="XOR Gate">
+      <a name="facing" val="east"/>
+      <a name="size" val="50"/>
+      <a name="inputs" val="2"/>
+    </comp>
+    <wire from="(50,100)" to="(130,100)"/>
+    <wire from="(130,100)" to="(130,110)"/>
+    <wire from="(130,110)" to="(155,110)"/>
+    <wire from="(50,150)" to="(130,150)"/>
+    <wire from="(130,150)" to="(130,130)"/>
+    <wire from="(130,130)" to="(155,130)"/>
+
+    <!-- XOR2: P XOR Cin = Sum -->
+    <comp lib="1" loc="(320,145)" name="XOR Gate">
+      <a name="facing" val="east"/>
+      <a name="size" val="50"/>
+      <a name="inputs" val="2"/>
+    </comp>
+    <wire from="(230,120)" to="(270,120)"/>
+    <wire from="(270,120)" to="(270,135)"/>
+    <wire from="(270,135)" to="(295,135)"/>
+    <wire from="(50,200)" to="(270,200)"/>
+    <wire from="(270,200)" to="(270,155)"/>
+    <wire from="(270,155)" to="(295,155)"/>
+
+    <!-- AND1: A AND B -->
+    <comp lib="1" loc="(240,240)" name="AND Gate">
+      <a name="facing" val="east"/>
+      <a name="size" val="50"/>
+      <a name="inputs" val="2"/>
+    </comp>
+    <wire from="(130,100)" to="(130,230)"/>
+    <wire from="(130,230)" to="(215,230)"/>
+    <wire from="(130,150)" to="(130,250)"/>
+    <wire from="(130,250)" to="(215,250)"/>
+
+    <!-- AND2: P AND Cin -->
+    <comp lib="1" loc="(240,310)" name="AND Gate">
+      <a name="facing" val="east"/>
+      <a name="size" val="50"/>
+      <a name="inputs" val="2"/>
+    </comp>
+    <wire from="(230,120)" to="(200,120)"/>
+    <wire from="(200,120)" to="(200,300)"/>
+    <wire from="(200,300)" to="(215,300)"/>
+    <wire from="(270,200)" to="(200,200)"/>
+    <wire from="(200,200)" to="(200,320)"/>
+    <wire from="(200,320)" to="(215,320)"/>
+
+    <!-- OR: Cout = AND1 OR AND2 -->
+    <comp lib="1" loc="(360,270)" name="OR Gate">
+      <a name="facing" val="east"/>
+      <a name="size" val="50"/>
+      <a name="inputs" val="2"/>
+    </comp>
+    <wire from="(290,240)" to="(330,240)"/>
+    <wire from="(330,240)" to="(330,260)"/>
+    <wire from="(330,260)" to="(335,260)"/>
+    <wire from="(290,310)" to="(330,310)"/>
+    <wire from="(330,310)" to="(330,280)"/>
+    <wire from="(330,280)" to="(335,280)"/>
+
+    <!-- Outputs: Sum, Cout -->
+    <comp lib="0" loc="(450,145)" name="Pin">
+      <a name="label" val="Sum"/>
+      <a name="output" val="true"/>
+      <a name="facing" val="west"/>
+    </comp>
+    <comp lib="0" loc="(450,270)" name="Pin">
+      <a name="label" val="Cout"/>
+      <a name="output" val="true"/>
+      <a name="facing" val="west"/>
+    </comp>
+    <wire from="(370,145)" to="(450,145)"/>
+    <wire from="(410,270)" to="(450,270)"/>
+  </circuit>
+
+  <!-- ========== 4-bit RCA Top-level Circuit ========== -->
+  <circuit name="4-bit_RCA">
+    <a name="circuit" val="4-bit_RCA"/>
+    <a name="clabel" val=""/>
+    <a name="clabelup" val="east"/>
+
+    <!-- === Inputs === -->
+    <!-- A bits -->
+    <comp lib="0" loc="(50,80)"  name="Pin"><a name="label" val="A0"/><a name="facing" val="east"/></comp>
+    <comp lib="0" loc="(50,130)" name="Pin"><a name="label" val="A1"/><a name="facing" val="east"/></comp>
+    <comp lib="0" loc="(50,180)" name="Pin"><a name="label" val="A2"/><a name="facing" val="east"/></comp>
+    <comp lib="0" loc="(50,230)" name="Pin"><a name="label" val="A3"/><a name="facing" val="east"/></comp>
+
+    <!-- B bits -->
+    <comp lib="0" loc="(50,300)" name="Pin"><a name="label" val="B0"/><a name="facing" val="east"/></comp>
+    <comp lib="0" loc="(50,350)" name="Pin"><a name="label" val="B1"/><a name="facing" val="east"/></comp>
+    <comp lib="0" loc="(50,400)" name="Pin"><a name="label" val="B2"/><a name="facing" val="east"/></comp>
+    <comp lib="0" loc="(50,450)" name="Pin"><a name="label" val="B3"/><a name="facing" val="east"/></comp>
+
+    <!-- Cin (ground = 0) -->
+    <comp lib="0" loc="(50,520)" name="Pin"><a name="label" val="Cin"/><a name="facing" val="east"/></comp>
+
+    <!-- === FA0 === -->
+    <comp lib="8" loc="(250,200)" name="Full_Adder">
+      <a name="label" val="FA0"/>
+    </comp>
+    <wire from="(50,80)"  to="(200,80)"/>
+    <wire from="(200,80)" to="(200,190)"/>
+    <wire from="(200,190)" to="(225,190)"/>
+    <wire from="(50,300)" to="(200,300)"/>
+    <wire from="(200,300)" to="(200,200)"/>
+    <wire from="(200,200)" to="(225,200)"/>
+    <wire from="(50,520)" to="(200,520)"/>
+    <wire from="(200,520)" to="(200,210)"/>
+    <wire from="(200,210)" to="(225,210)"/>
+
+    <!-- === FA1 === -->
+    <comp lib="8" loc="(450,200)" name="Full_Adder">
+      <a name="label" val="FA1"/>
+    </comp>
+    <wire from="(50,130)"  to="(190,130)"/>
+    <wire from="(190,130)" to="(190,390)"/>
+    <wire from="(190,390)" to="(400,390)"/>
+    <wire from="(400,390)" to="(400,190)"/>
+    <wire from="(400,190)" to="(425,190)"/>
+    <wire from="(50,350)"  to="(185,350)"/>
+    <wire from="(185,350)" to="(185,400)"/>
+    <wire from="(185,400)" to="(405,400)"/>
+    <wire from="(405,400)" to="(405,200)"/>
+    <wire from="(405,200)" to="(425,200)"/>
+    <!-- Cout FA0 → Cin FA1 -->
+    <wire from="(300,215)" to="(380,215)"/>
+    <wire from="(380,215)" to="(380,210)"/>
+    <wire from="(380,210)" to="(425,210)"/>
+
+    <!-- === FA2 === -->
+    <comp lib="8" loc="(650,200)" name="Full_Adder">
+      <a name="label" val="FA2"/>
+    </comp>
+    <wire from="(50,180)"  to="(180,180)"/>
+    <wire from="(180,180)" to="(180,410)"/>
+    <wire from="(180,410)" to="(600,410)"/>
+    <wire from="(600,410)" to="(600,190)"/>
+    <wire from="(600,190)" to="(625,190)"/>
+    <wire from="(50,400)"  to="(175,400)"/>
+    <wire from="(175,400)" to="(175,420)"/>
+    <wire from="(175,420)" to="(605,420)"/>
+    <wire from="(605,420)" to="(605,200)"/>
+    <wire from="(605,200)" to="(625,200)"/>
+    <!-- Cout FA1 → Cin FA2 -->
+    <wire from="(500,215)" to="(580,215)"/>
+    <wire from="(580,215)" to="(580,210)"/>
+    <wire from="(580,210)" to="(625,210)"/>
+
+    <!-- === FA3 === -->
+    <comp lib="8" loc="(850,200)" name="Full_Adder">
+      <a name="label" val="FA3"/>
+    </comp>
+    <wire from="(50,230)"  to="(170,230)"/>
+    <wire from="(170,230)" to="(170,430)"/>
+    <wire from="(170,430)" to="(800,430)"/>
+    <wire from="(800,430)" to="(800,190)"/>
+    <wire from="(800,190)" to="(825,190)"/>
+    <wire from="(50,450)"  to="(165,450)"/>
+    <wire from="(165,450)" to="(165,440)"/>
+    <wire from="(165,440)" to="(805,440)"/>
+    <wire from="(805,440)" to="(805,200)"/>
+    <wire from="(805,200)" to="(825,200)"/>
+    <!-- Cout FA2 → Cin FA3 -->
+    <wire from="(700,215)" to="(780,215)"/>
+    <wire from="(780,215)" to="(780,210)"/>
+    <wire from="(780,210)" to="(825,210)"/>
+
+    <!-- === Outputs === -->
+    <comp lib="0" loc="(1000,150)" name="Pin"><a name="label" val="S0"/><a name="output" val="true"/><a name="facing" val="west"/></comp>
+    <comp lib="0" loc="(1000,180)" name="Pin"><a name="label" val="S1"/><a name="output" val="true"/><a name="facing" val="west"/></comp>
+    <comp lib="0" loc="(1000,210)" name="Pin"><a name="label" val="S2"/><a name="output" val="true"/><a name="facing" val="west"/></comp>
+    <comp lib="0" loc="(1000,240)" name="Pin"><a name="label" val="S3"/><a name="output" val="true"/><a name="facing" val="west"/></comp>
+    <comp lib="0" loc="(1000,280)" name="Pin"><a name="label" val="Cout"/><a name="output" val="true"/><a name="facing" val="west"/></comp>
+
+    <!-- Sum wires -->
+    <wire from="(300,190)" to="(1000,150)"/>
+    <wire from="(500,190)" to="(1000,180)"/>
+    <wire from="(700,190)" to="(1000,210)"/>
+    <wire from="(900,190)" to="(1000,240)"/>
+
+    <!-- Final Cout -->
+    <wire from="(900,215)" to="(950,215)"/>
+    <wire from="(950,215)" to="(950,280)"/>
+    <wire from="(950,280)" to="(1000,280)"/>
+  </circuit>
+</project>
